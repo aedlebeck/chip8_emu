@@ -29,6 +29,6 @@ pub mod defaults {
     pub const SDL_HEIGHT:u32 = (32 as u32) * SCALE_FACTOR;
 
     pub const HZ:u32 = 500;
-    pub const SLEEP_TIME:f32 = 1.0 / (HZ as f32);
-    pub const VBI_TIME:u64 = 17; // milli
+    pub const CLOCK_SPEED:u64 = 1000;
+    pub const VBI_TIME:u64 = 17; // 1 / 60Hz = 17 milli
 }
