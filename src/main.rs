@@ -48,7 +48,8 @@ fn main() {
     let mut driver = Driver::new(&sdl_context);
     let mut input = InputDriver::new(&sdl_context);
 
-   let mut sixty_hertz = Instant::now();
+   let mut frame_buffer = Instant::now();
+   let mut clock_hertz = Instant::now();
   'runner:  loop {
         for event in input.poll() {
             match event {
@@ -69,12 +70,15 @@ fn main() {
             }
         }
 
-        if sixty_hertz.elapsed() >= time::Duration::from_millis(VBI_TIME) {
+        if frame_buffer.elapsed() >= time::Duration::from_millis(VBI_TIME) {
             driver.draw(&chip.vram);
-            sixty_hertz = Instant::now();
+            frame_buffer = Instant::now();
             chip.timer_tick();
         }
-        chip.cycle();
-        thread::sleep(time::Duration::from_micros(CLOCK_SPEED));
+
+        if clock_hertz.elapsed() >= time::Duration::from_micros(CLOCK_SPEED) {
+            chip.cycle();
+            clock_hertz = Instant::now();
+        }
     }
 }

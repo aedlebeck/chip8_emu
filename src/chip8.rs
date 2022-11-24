@@ -63,7 +63,7 @@ impl Chip8 {
             (self.opcode & 0x00F0) >> 4 as u8,
             (self.opcode & 0x000F) as u8,
         );
-        println!("OPCODE: {:?}", self.opcode);
+        // println!("OPCODE: {:?}", self.opcode);
         match nibbles {
             (0x00, 0x00, 0x0e, 0x00) => self.op_00e0(),
             (0x00, 0x00, 0x0e, 0x0e) => self.op_00ee(),
