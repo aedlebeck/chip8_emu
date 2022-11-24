@@ -1,5 +1,4 @@
 extern crate sdl2;
-// use sdl2;
 pub mod chip8;
 pub mod driver;
 pub mod input_driver;
@@ -75,27 +74,4 @@ fn main() {
         chip.cycle();
         thread::sleep(time::Duration::from_millis(1));
     }
-
-
-    // let quit = false;
-    // while !quit {
-    //     Press 'q' to quit
-    //     quit = keypad[4];
-    //     FIXME Sound timer and delay timer
-    //     if chip.sound_timer > 0 {
-    //         chip.sound_timer -= 1;
-    //     }
-    //     if chip.delay_timer > 0 {
-    //         chip.delay_timer -= 1;
-    //         continue;
-    //     }
-    //     if chip.state_change {
-    //         driver.draw(&chip.vram);
-    //         chip.state_change = false;
-    //     }
-        
-    //     let keypad = driver.poll().unwrap();
-    //     chip.cycle(keypad);
-    //     thread::sleep(time::Duration::from_millis(2));
-    // }
 }

@@ -1,4 +1,4 @@
-pub mod consts {
+pub mod defaults {
     pub const START_ADDRESS: u32 = 0x200;
     pub const FONT_START_ADDRESS: u32 = 0x50;
     
