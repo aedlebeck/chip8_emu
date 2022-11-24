@@ -2,8 +2,7 @@ use rand::Rng;
 use std::fs::File;
 use std::io;
 use std::io::Read;
-// use crate::configs::consts::START_ADDRESS;
-use crate::configs::consts::*;
+use crate::configs::defaults::*;
 
 pub struct Chip8 {
     registers: [u8; 16],
@@ -15,7 +14,6 @@ pub struct Chip8 {
     pub delay_timer: u8,
     pub sound_timer: u8,
     keypad: [bool; 16],
-    // vram: [u32; 64 * 32],
     pub vram: [[u8; 64]; 32],
     pub state_change: bool,
     opcode: u16,
