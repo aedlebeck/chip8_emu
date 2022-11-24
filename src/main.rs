@@ -1,17 +1,16 @@
 extern crate sdl2;
 pub mod chip8;
+pub mod configs;
 pub mod driver;
 pub mod input_driver;
-pub mod configs;
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-use std::{thread, time};
-use std::time::Instant;
 use crate::chip8::Chip8;
+use crate::configs::defaults::*;
 use crate::driver::Driver;
 use crate::input_driver::InputDriver;
-use crate::configs::defaults::*;
-
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
+use std::time::Instant;
+use std::{thread, time};
 
 fn match_key(key: Keycode) -> Option<usize> {
     match key {
@@ -35,7 +34,6 @@ fn match_key(key: Keycode) -> Option<usize> {
     }
 }
 
-
 fn main() {
     println!("Hello, world!");
     // Instantiate chip8
@@ -48,25 +46,33 @@ fn main() {
     let mut driver = Driver::new(&sdl_context);
     let mut input = InputDriver::new(&sdl_context);
 
-   let mut frame_buffer = Instant::now();
-   let mut clock_hertz = Instant::now();
-  'runner:  loop {
+    let mut frame_buffer = Instant::now();
+    let mut clock_hertz = Instant::now();
+    'runner: loop {
         for event in input.poll() {
             match event {
-                Event::Quit{..} | Event::KeyDown{keycode: Some(Keycode::Escape), ..}=> {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => {
                     break 'runner;
-                },
-                Event::KeyDown{keycode: Some(key), ..} => {
+                }
+                Event::KeyDown {
+                    keycode: Some(key), ..
+                } => {
                     if let Some(k) = match_key(key) {
                         chip.set_key(k, true);
                     }
-                },
-                Event::KeyUp{keycode: Some(key), ..} => {
+                }
+                Event::KeyUp {
+                    keycode: Some(key), ..
+                } => {
                     if let Some(k) = match_key(key) {
                         chip.set_key(k, false);
                     }
-                },
-                _ => ()
+                }
+                _ => (),
             }
         }
 

@@ -30,5 +30,5 @@ pub mod defaults {
 
     pub const HZ:u32 = 500;
     pub const CLOCK_SPEED:u64 = 1800;
-    pub const VBI_TIME:u64 = 17; // 1 / 60Hz = 17 milli
+    pub const VBI_TIME:u64 = 14; // 1 / 60Hz = 17 milli
 }
