@@ -49,7 +49,6 @@ fn main() {
     let mut input = InputDriver::new(&sdl_context);
 
    let mut sixty_hertz = Instant::now();
-   let mut clock_hertz = Instant::now();
   'runner:  loop {
         for event in input.poll() {
             match event {
