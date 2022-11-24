@@ -6,9 +6,11 @@ pub mod configs;
 use sdl2::event::{Event};
 use sdl2::keyboard::Keycode;
 use std::{thread, time};
+use std::time::{Duration, Instant};
 use crate::chip8::Chip8;
 use crate::driver::Driver;
 use crate::input_driver::InputDriver;
+use crate::configs::defaults::*;
 
 
 fn match_key(key: Keycode) -> Option<usize> {
@@ -46,7 +48,7 @@ fn main() {
     let mut driver = Driver::new(&sdl_context);
     let mut input = InputDriver::new(&sdl_context);
 
-   
+   let mut start = Instant::now();
   'runner:  loop {
         for event in input.poll() {
             match event {
@@ -67,9 +69,10 @@ fn main() {
             }
         }
 
-        if chip.state_change {
+        if start.elapsed() >= time::Duration::from_millis(VBI_TIME) {
             driver.draw(&chip.vram);
-            chip.state_change = false;
+            start = Instant::now();
+            chip.timer_tick();
         }
         chip.cycle();
         thread::sleep(time::Duration::from_millis(1));

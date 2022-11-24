@@ -15,7 +15,6 @@ pub struct Chip8 {
     pub sound_timer: u8,
     keypad: [bool; 16],
     pub vram: [[u8; 64]; 32],
-    pub state_change: bool,
     opcode: u16,
     waiting: bool,
     wait_key: u8,
@@ -34,7 +33,6 @@ impl Chip8 {
             sound_timer: 0,
             keypad: [false; 16],
             vram: [[0; 64]; 32],
-            state_change: false,
             opcode: 0,
             waiting: false,
             wait_key: 0,
@@ -42,7 +40,6 @@ impl Chip8 {
     }
 
     pub fn cycle(&mut self) {
-        self.state_change = false;
 
         // Fetch opcode
         self.opcode = ((self.memory[self.pc as usize] as u16) << 8)
@@ -160,7 +157,6 @@ impl Chip8 {
     // 00E0 - CLS, clears the display
     fn op_00e0(&mut self) {
         self.vram = [[0; 64]; 32];
-        self.state_change = true;
     }
 
     // 00EE - RET, return from subroutine
@@ -411,7 +407,6 @@ impl Chip8 {
                 self.vram[y as usize][x as usize] ^= color;
             }
         }
-        self.state_change = true;
     }
 
     // Ex9E - SKP vx
