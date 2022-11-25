@@ -29,7 +29,7 @@ fn match_key(key: Keycode) -> Option<usize> {
         Keycode::Z => Some(0xA),
         Keycode::X => Some(0x0),
         Keycode::C => Some(0xB),
-        Keycode::V => Some(0xF),
+        Keycode::V => Some(0xF), 
         _ => None,
     }
 }
@@ -46,8 +46,18 @@ fn main() {
     let mut driver = Driver::new(&sdl_context);
     let mut input = InputDriver::new(&sdl_context);
 
+    // let mut clock_hertz = Instant::now();
+    let mut timer = Instant::now();
+    let mut ticks_per_frame = 9;
+    let mut buffer_delay:u64 = BUFFER_DELAY;
+    let mut counter = 0;
+    
+    println!("Ticks per frame: {ticks_per_frame}");
+    println!("Clock Delay: {}", BUFFER_DELAY);
+    let mut clock_counter = 0;
+    let mut timer_counter = 0;
+    
     let mut frame_buffer = Instant::now();
-    let mut clock_hertz = Instant::now();
     'runner: loop {
         for event in input.poll() {
             match event {
@@ -58,13 +68,39 @@ fn main() {
                 } => {
                     break 'runner;
                 }
+
                 Event::KeyDown {
                     keycode: Some(key), ..
                 } => {
+                    // Interpret keycode for chip8
                     if let Some(k) = match_key(key) {
                         chip.set_key(k, true);
                     }
+                    // Increment ticks per frame
+                    if key == Keycode::Up {
+                        ticks_per_frame += 1;
+                    }
+
+                    // Decrement ticks per frame
+                    if key == Keycode::Down {
+                        if ticks_per_frame > 1 {
+                            ticks_per_frame -= 1;
+                        }
+                    }
+
+                    // Increase video refresh speed
+                    if key == Keycode::Right {
+                        buffer_delay -= 1;
+                    }
+                    
+                    // Decrease video refresh speed
+                    if key == Keycode::Left {
+                        if buffer_delay > 1 {
+                            buffer_delay += 1;
+                        }
+                    }
                 }
+
                 Event::KeyUp {
                     keycode: Some(key), ..
                 } => {
@@ -76,15 +112,28 @@ fn main() {
             }
         }
 
-        if frame_buffer.elapsed() >= time::Duration::from_millis(VBI_TIME) {
-            driver.draw(&chip.vram);
-            frame_buffer = Instant::now();
-            chip.timer_tick();
+        if timer.elapsed() >= time::Duration::from_secs(1) {
+            println!("Clock Hz: {}, Timer Hz: {}", clock_counter as f32 / 1.0, timer_counter as f32 / 1.0);
+            clock_counter = 0;
+            timer_counter = 0;
+            timer = Instant::now();
         }
 
-        if clock_hertz.elapsed() >= time::Duration::from_micros(CLOCK_SPEED) {
-            chip.cycle();
-            clock_hertz = Instant::now();
+        chip.cycle();
+        counter += 1;
+
+        if counter >= ticks_per_frame {
+            chip.timer_tick();
+            if chip.vram_change {
+                driver.draw(&chip.vram);
+                chip.vram_change = false;
+            }
+            timer_counter += 1;
+            counter = 0;
+            thread::sleep(time::Duration::from_millis(buffer_delay).saturating_sub(frame_buffer.elapsed()));
+            frame_buffer = Instant::now();
         }
+
+        clock_counter += 1;
     }
 }

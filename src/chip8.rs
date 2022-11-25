@@ -15,6 +15,7 @@ pub struct Chip8 {
     pub sound_timer: u8,
     keypad: [bool; 16],
     pub vram: [[u8; 64]; 32],
+    pub vram_change: bool,
     opcode: u16,
     waiting: bool,
     wait_key: u8,
@@ -33,6 +34,7 @@ impl Chip8 {
             sound_timer: 0,
             keypad: [false; 16],
             vram: [[0; 64]; 32],
+            vram_change: false,
             opcode: 0,
             waiting: false,
             wait_key: 0,
@@ -157,6 +159,7 @@ impl Chip8 {
     // 00E0 - CLS, clears the display
     fn op_00e0(&mut self) {
         self.vram = [[0; 64]; 32];
+        self.vram_change = true;
     }
 
     // 00EE - RET, return from subroutine
@@ -398,6 +401,7 @@ impl Chip8 {
         let n: u8 = (self.opcode & 0x000F) as u8;
 
         self.registers[0xF] = 0;
+   
         for byte in 0..n {
             let y = (self.registers[vy as usize] + byte) % VIDEO_HEIGHT;
             for bit in 0..8 {
@@ -407,6 +411,7 @@ impl Chip8 {
                 self.vram[y as usize][x as usize] ^= color;
             }
         }
+        self.vram_change = true;
     }
 
     // Ex9E - SKP vx
