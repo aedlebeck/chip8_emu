@@ -90,14 +90,14 @@ fn main() {
 
                     // Increase video refresh speed
                     if key == Keycode::Right {
-                        buffer_delay -= 1;
+                        if buffer_delay > 1 {
+                            // buffer_delay -= 1;
+                        }
                     }
                     
                     // Decrease video refresh speed
                     if key == Keycode::Left {
-                        if buffer_delay > 1 {
-                            buffer_delay += 1;
-                        }
+                            // buffer_delay += 1;
                     }
                 }
 
