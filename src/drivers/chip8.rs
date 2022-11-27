@@ -109,8 +109,8 @@ impl Chip8 {
         }
     }
 
-    pub fn load_rom(&mut self) -> io::Result<()> {
-        let mut f = File::open("./roms/flightrunner.ch8")?;
+    pub fn load_rom(&mut self, rom:String) -> io::Result<()> {
+        let mut f = File::open(rom)?;
         let mut buf: Vec<u8> = Vec::with_capacity(4096);
         f.read_to_end(&mut buf)?;
 
