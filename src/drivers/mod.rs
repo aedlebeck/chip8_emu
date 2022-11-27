@@ -3,3 +3,4 @@ pub mod video_driver;
 pub mod input_driver;
 pub mod configs;
 pub mod emulator;
+pub mod rewind;

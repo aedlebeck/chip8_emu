@@ -7,12 +7,14 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Instant;
 use std::{thread, time};
+use super::rewind::Rewind;
 
 pub struct Emulator {
     chip8: Chip8,
     video_driver: VideoDriver,
     input_driver: InputDriver,
     paused: bool,
+    rewind: Rewind,
 }
 
 impl Emulator {
@@ -23,6 +25,7 @@ impl Emulator {
             video_driver: VideoDriver::new(&sdl_context),
             input_driver: InputDriver::new(&sdl_context),
             paused: false,
+            rewind: Rewind::new(),
         }
     }
 
@@ -37,6 +40,10 @@ impl Emulator {
         println!("Clock Delay: {}", BUFFER_DELAY);
         let mut clock_counter = 0;
         let mut timer_counter = 0;
+        
+
+        let mut rewind_ctr = 0;
+        self.rewind.capture(&self.chip8);
 
         let mut frame_buffer = Instant::now();
         'runner: loop {
@@ -50,26 +57,25 @@ impl Emulator {
                     } => {
                         break 'runner;
                     }
-
                     Event::KeyDown {
                         keycode: Some(key), ..
                     } => {
                         // Interpret keycode for chip8
                         if let Some(k) = match_key(key) {
-                            self.chip8.set_key(k, true);
+                            if !self.paused {
+                                self.chip8.set_key(k, true);
+                            }
                         }
                         // Increment ticks per frame
                         if key == Keycode::Up {
                             ticks_per_frame += 1;
                         }
-
                         // Decrement ticks per frame
                         if key == Keycode::Down {
                             if ticks_per_frame > 1 {
                                 ticks_per_frame -= 1;
                             }
                         }
-
                         // Pause game
                         if key == Keycode::Space {
                             if self.paused {
@@ -78,19 +84,32 @@ impl Emulator {
                                 self.paused = true;
                             }
                         }
+                        // Rewind
+                        if key == Keycode::Left {
+                            self.chip8 = self.rewind.step_back();
+                            rewind_ctr = 0;
+                        }
                     }
 
                     Event::KeyUp {
                         keycode: Some(key), ..
                     } => {
                         if let Some(k) = match_key(key) {
-                            self.chip8.set_key(k, false);
+                            if !self.paused {
+                                self.chip8.set_key(k, false);
+                            }
                         }
                     }
                     _ => (),
                 }
             }
             if !self.paused {
+                if rewind_ctr > 250 {
+                    self.rewind.capture(&self.chip8);
+                    rewind_ctr = 0;
+                }
+                rewind_ctr += 1;
+
                 if timer.elapsed() >= time::Duration::from_secs(1) {
                     println!(
                         "Clock Hz: {}, Timer Hz: {}",

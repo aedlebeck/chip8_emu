@@ -4,6 +4,7 @@ use std::io;
 use std::io::Read;
 use crate::drivers::configs::defaults::*;
 
+#[derive(Copy, Clone)]
 pub struct Chip8 {
     registers: [u8; 16],
     memory: [u8; 4096],
@@ -13,7 +14,7 @@ pub struct Chip8 {
     sp: usize,
     pub delay_timer: u8,
     pub sound_timer: u8,
-    keypad: [bool; 16],
+    pub keypad: [bool; 16],
     pub vram: [[u8; 64]; 32],
     pub vram_change: bool,
     opcode: u16,
@@ -181,7 +182,7 @@ impl Chip8 {
     // Call subroutine at nnn
     fn op_2nnn(&mut self) {
         let address: u16 = self.opcode & 0x0FFF;
-        self.stack[self.sp] = self.pc as u16;
+        self.stack[self.sp] = self.pc as u16; // FIXME INDEX OUT OF BOUNDS ERROR
         self.sp += 1;
         self.pc = address as usize;
     }
