@@ -2,7 +2,7 @@ use rand::Rng;
 use std::fs::File;
 use std::io;
 use std::io::Read;
-use crate::configs::defaults::*;
+use crate::drivers::configs::defaults::*;
 
 pub struct Chip8 {
     registers: [u8; 16],
@@ -60,9 +60,9 @@ impl Chip8 {
     // Match opcode and execute
     fn execute(&mut self) {
         let nibbles = (
-            (self.opcode & 0xF000) >> 12 as u8,
-            (self.opcode & 0x0F00) >> 8 as u8,
-            (self.opcode & 0x00F0) >> 4 as u8,
+            ((self.opcode & 0xF000) >> 12) as u8,
+            ((self.opcode & 0x0F00) >> 8) as u8,
+            ((self.opcode & 0x00F0) >> 4) as u8,
             (self.opcode & 0x000F) as u8,
         );
         // println!("OPCODE: {:?}", self.opcode);
@@ -110,7 +110,7 @@ impl Chip8 {
     }
 
     pub fn load_rom(&mut self) -> io::Result<()> {
-        let mut f = File::open("./roms/sweetcopter.ch8")?;
+        let mut f = File::open("./roms/flightrunner.ch8")?;
         let mut buf: Vec<u8> = Vec::with_capacity(4096);
         f.read_to_end(&mut buf)?;
 

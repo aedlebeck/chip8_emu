@@ -3,12 +3,12 @@ use sdl2::pixels;
 use sdl2::rect::Rect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use crate::configs::defaults::*;
-pub struct Driver {
+use crate::drivers::configs::defaults::*;
+pub struct VideoDriver {
     canvas: Canvas<Window>,
 }
 
-impl Driver {
+impl VideoDriver {
     pub fn new(sdl_context: &sdl2::Sdl) -> Self {
         let video_subsys = sdl_context.video().unwrap();
         let window = video_subsys
@@ -28,7 +28,7 @@ impl Driver {
             canvas.clear();
             canvas.present();
     
-            Driver { canvas: canvas }
+            VideoDriver { canvas: canvas }
     }
 
     pub fn draw(&mut self, pixels: &[[u8; 64]; 32]) {

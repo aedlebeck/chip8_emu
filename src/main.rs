@@ -1,12 +1,9 @@
 extern crate sdl2;
-pub mod chip8;
-pub mod configs;
-pub mod driver;
-pub mod input_driver;
-use crate::chip8::Chip8;
-use crate::configs::defaults::*;
-use crate::driver::Driver;
-use crate::input_driver::InputDriver;
+pub mod drivers;
+use crate::drivers::configs::defaults::*;
+use crate::drivers::input_driver::InputDriver;
+use crate::drivers::video_driver::VideoDriver;
+use crate::drivers::chip8::Chip8;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use std::time::Instant;
@@ -43,13 +40,12 @@ fn main() {
 
     // Instantiate driver
     let sdl_context = sdl2::init().unwrap();
-    let mut driver = Driver::new(&sdl_context);
+    let mut driver = VideoDriver::new(&sdl_context);
     let mut input = InputDriver::new(&sdl_context);
 
     // let mut clock_hertz = Instant::now();
     let mut timer = Instant::now();
     let mut ticks_per_frame = 9;
-    let mut buffer_delay:u64 = BUFFER_DELAY;
     let mut counter = 0;
     
     println!("Ticks per frame: {ticks_per_frame}");
@@ -88,17 +84,6 @@ fn main() {
                         }
                     }
 
-                    // Increase video refresh speed
-                    if key == Keycode::Right {
-                        if buffer_delay > 1 {
-                            // buffer_delay -= 1;
-                        }
-                    }
-                    
-                    // Decrease video refresh speed
-                    if key == Keycode::Left {
-                            // buffer_delay += 1;
-                    }
                 }
 
                 Event::KeyUp {
@@ -130,7 +115,7 @@ fn main() {
             }
             timer_counter += 1;
             counter = 0;
-            thread::sleep(time::Duration::from_millis(buffer_delay).saturating_sub(frame_buffer.elapsed()));
+            thread::sleep(time::Duration::from_millis(BUFFER_DELAY).saturating_sub(frame_buffer.elapsed()));
             frame_buffer = Instant::now();
         }
 
