@@ -21,8 +21,8 @@ pub mod defaults {
         0xF0, 0x80, 0xF0, 0x80, 0x80, // F
     ]; 
 
-    pub const VIDEO_WIDTH:u8 = 64;
-    pub const VIDEO_HEIGHT:u8 = 32;
+    pub const VIDEO_WIDTH:u16 = 64;
+    pub const VIDEO_HEIGHT:u16 = 32;
 
     pub const SCALE_FACTOR:u32 = 20;
     pub const SDL_WIDTH:u32 = (64 as u32) * SCALE_FACTOR;

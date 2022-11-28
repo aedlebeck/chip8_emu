@@ -29,8 +29,8 @@ impl Emulator {
         }
     }
 
-    pub fn run(&mut self, rom:String) {
-        self.chip8.load_rom(rom).expect("Unable to load rom");
+    pub fn run(&mut self, rom:&str) {
+        self.chip8.load_rom(&rom).expect("Unable to load rom");
         // let mut clock_hertz = Instant::now();
         let mut timer = Instant::now();
         let mut ticks_per_frame = 9;

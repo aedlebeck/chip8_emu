@@ -110,7 +110,7 @@ impl Chip8 {
         }
     }
 
-    pub fn load_rom(&mut self, rom:String) -> io::Result<()> {
+    pub fn load_rom(&mut self, rom:&str) -> io::Result<()> {
         let mut f = File::open(rom)?;
         let mut buf: Vec<u8> = Vec::with_capacity(4096);
         f.read_to_end(&mut buf)?;
@@ -182,6 +182,9 @@ impl Chip8 {
     // Call subroutine at nnn
     fn op_2nnn(&mut self) {
         let address: u16 = self.opcode & 0x0FFF;
+        if self.sp >= 16 {
+            self.sp = 15;
+        }
         self.stack[self.sp] = self.pc as u16; // FIXME INDEX OUT OF BOUNDS ERROR
         self.sp += 1;
         self.pc = address as usize;
@@ -404,9 +407,9 @@ impl Chip8 {
         self.registers[0xF] = 0;
    
         for byte in 0..n {
-            let y = (self.registers[vy as usize] + byte) % VIDEO_HEIGHT;
+            let y = ((self.registers[vy as usize] + byte) as u16) % VIDEO_HEIGHT;
             for bit in 0..8 {
-                let x = (self.registers[vx as usize] + bit) % VIDEO_WIDTH; //FIXME ADD WITH OVERFLOW
+                let x = (self.registers[vx as usize] as u16 + bit as u16) % VIDEO_WIDTH; 
                 let color = (self.memory[self.index + byte as usize] >> (7 - bit)) & 1;
                 self.registers[0xF] |= color & self.vram[y as usize][x as usize];
                 self.vram[y as usize][x as usize] ^= color;
@@ -450,26 +453,22 @@ impl Chip8 {
         let vx: u8 = ((self.opcode & 0x0F00) >> 8u8) as u8;
 
         if self.waiting {
-            println!("WAITING for keyup");
+            // println!("WAITING for keyup");
             if self.keypad[self.wait_key as usize] == false {
                 self.waiting = false;
                 self.registers[vx as usize] = self.wait_key as u8;
-                println!("NO LONGER WAITING");
+                // println!("NO LONGER WAITING");
                 return;
             }
             self.pc -= 2;
         } else {
-            println!("WAITING for keydown");
+            // println!("WAITING for keydown");
             for i in 0..self.keypad.len() {
                 if self.keypad[i] {
-                    // self.registers[vx as usize] = i as u8;
                     self.wait_key = i as u8;
                     self.waiting = true;
                 }
             }
-            // if !pressed {
-            //     self.pc -= 2;
-            // }
             self.pc -= 2;
         }
     }
